@@ -1,0 +1,76 @@
+version: '3.8'
+services:
+
+  nginx:
+    container_name: ${COMPOSE_PROJECT_NAME}_nginx
+    image: nginx:stable-alpine
+    environment:
+      VIRTUAL_HOST: natour-price-calculation.artack.test
+    ports:
+      - "80:80"
+    volumes:
+      - './:/app'
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+
+  php:
+    container_name: ${COMPOSE_PROJECT_NAME}_php
+    build:
+      context: ./docker
+      dockerfile: php/Dockerfile
+    environment:
+      - SSH_AUTH_SOCK=/run/host-services/ssh-auth.sock
+    volumes:
+      - './:/app'
+      - ./docker/php/99-custom.ini:/usr/local/etc/php/conf.d/99-custom.ini:ro
+      - /run/host-services/ssh-auth.sock:/run/host-services/ssh-auth.sock
+    depends_on:
+      - db
+
+  php_xdebug:
+    container_name: ${COMPOSE_PROJECT_NAME}_php_xdebug
+    build:
+      context: ./docker
+      dockerfile: php_xdebug/Dockerfile
+    volumes:
+      - './:/app'
+      - ./docker/php_xdebug/99-custom.ini:/usr/local/etc/php/conf.d/99-custom.ini:ro
+    depends_on:
+      - db
+
+  db:
+    container_name: ${COMPOSE_PROJECT_NAME}_db
+    platform: linux/x86_64
+    image: mysql:5.7
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=app
+      - MYSQL_USER=app
+      - MYSQL_PASSWORD=app
+      - TZ=Europe/Zurich
+    volumes:
+      - ./var/mysql:/var/lib/mysql
+
+  mail:
+    container_name: ${COMPOSE_PROJECT_NAME}_mail
+    image: schickling/mailcatcher:latest
+    ports:
+      - "1080:1080"
+    environment:
+      VIRTUAL_HOST: natour-price-calculation-mail.artack.test
+      VIRTUAL_PORT: 1080
+
+  phpmyadmin:
+    container_name: ${COMPOSE_PROJECT_NAME}_phpmyadmin
+    image: phpmyadmin:latest
+    restart: always
+    ports:
+      - "8089:80"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_PASSWORD=root
+      - MYSQL_DATABASE=app
+      - PMA_USER=root
+      - PMA_PASSWORD=root
+      - PMA_ARBITRARY=1
+    depends_on:
+      - db

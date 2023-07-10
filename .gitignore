@@ -1,0 +1,7 @@
+###> app ###
+.DS_Store
+.idea
+/var/docker/mysql/*
+/local
+/local/*
+###< app ###
