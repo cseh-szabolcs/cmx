@@ -5,7 +5,7 @@ services:
     container_name: ${COMPOSE_PROJECT_NAME}_nginx
     image: nginx:stable-alpine
     environment:
-      VIRTUAL_HOST: natour-price-calculation.artack.test
+      VIRTUAL_HOST: cmx.localhost
     ports:
       - "80:80"
     volumes:
@@ -56,7 +56,7 @@ services:
     ports:
       - "1080:1080"
     environment:
-      VIRTUAL_HOST: natour-price-calculation-mail.artack.test
+      VIRTUAL_HOST: cmx.localhost
       VIRTUAL_PORT: 1080
 
   phpmyadmin:
@@ -64,7 +64,7 @@ services:
     image: phpmyadmin:latest
     restart: always
     ports:
-      - "8089:80"
+      - "8081:80"
     environment:
       - MYSQL_ROOT_PASSWORD=root
       - MYSQL_PASSWORD=root

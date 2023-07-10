@@ -13,12 +13,6 @@ RUN curl -1sLf 'https://dl.cloudsmith.io/public/symfony/stable/setup.deb.sh' | b
 RUN apt install symfony-cli
 RUN symfony server:ca:install
 
-# Node.js
-RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash - && \
-    apt-get install -y nodejs && \
-    npm install npm -g && \
-    npm install yarn -g
-
 WORKDIR /app
 
 # Composer
